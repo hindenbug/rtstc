@@ -1,0 +1,6 @@
+[package]
+name = "rtstc"
+version = "0.1.0"
+authors = ["hindenbug <manoj.mk27@gmail.com>"]
+
+[dependencies]
