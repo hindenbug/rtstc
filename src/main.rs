@@ -1,5 +1,6 @@
 mod tokenizer;
 
 fn main() {
-    println!("Hello, world!");
+    let input = "(add 22 (subtract 4 2))";
+    println!("{:?}", tokenizer::tokenizer::tokenize(input));
 }
