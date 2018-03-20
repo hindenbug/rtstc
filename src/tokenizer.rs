@@ -1,19 +1,37 @@
 pub mod tokenizer {
+
+    #[derive(Debug, PartialEq)]
     pub enum TokenType {
         OpenParen,
         CloseParen,
-        Name(String),
-        Number(String),
-        String(String),
+        Name,
+        Number,
+        String,
+        TokenError
     }
 
+    #[derive(Debug, PartialEq)]
     pub struct Token {
         type_: TokenType,
-        value: String
+        value: String,
     }
 
-    pub fn tokenizer(input: &str) -> Result<Vec<Token>, String> {
-        let mut tokens: Vec<Token> = vec![Token {type_: TokenType::OpenParen, value: "test".to_string()}];
+    pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
+        let mut tokens: Vec<Token> = vec![];
+
+        while let Some(ch) = input.chars().next() {
+            match ch {
+                ch if ch.is_whitespace() => continue,
+                '(' => tokens.push(Token { type_: TokenType::OpenParen, value: ch.to_string() }),
+                ')' => tokens.push(Token { type_: TokenType::CloseParen, value: ch.to_string() }),
+                'a'...'z' => tokens.push(Token { type_: TokenType::Name, value: ch.to_string() }),
+                '0'...'9' => tokens.push(Token { type_: TokenType::Number, value: ch.to_string() }),
+                '"' => tokens.push(Token { type_: TokenType::String, value: ch.to_string() }),
+                _ => tokens.push(Token { type_: TokenType::TokenError, value: format!("I don't know what this character is: {}", ch) }),
+            }
+        }
+
+        println!("{:?}", tokens);
 
         Ok(tokens)
     }
@@ -24,18 +42,15 @@ pub mod tokenizer {
 
         #[test]
         fn test_tokenizer() {
-            assert_eq!(tokenizer("(add 2 (subtract 4 2))"), [
-                Token {type_: TokenType::OpenParen, value: "test"}
-                //{ type_: Token::OpenParen,  value: '('        },
-                //{ type_: Token::Name,   value: "add"      },
-                //{ type: Token::Number, value: "2"        },
-                //{ type: Token::OpenParen,  value: '('        },
-                //{ type: Token::Name,   value: "subtract" },
-                //{ type: Token::Number, value: "4"        },
-                //{ type: Token::Number, value: "2"        },
-                //{ type: Token::CloseParen,  value: ')'        },
-                //{ type: Token::CloseParen,  value: ')'        },
-            ])
+            assert_eq!(
+                tokenizer("("),
+                Ok(vec![
+                    Token {
+                        type_: TokenType::OpenParen,
+                        value: "(".to_string(),
+                    }
+                ])
+            )
         }
     }
 }
