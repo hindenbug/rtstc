@@ -60,7 +60,7 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
 
                 while let Some(c) = chars_.clone().peekable().peek() {
                     match c {
-                        &'"' => continue,
+                        &'"' => break,
                         _ => str_.push(chars_.next().unwrap()),
                     }
                 }
