@@ -1,6 +1,7 @@
 mod tokenizer;
+mod parser;
 
 fn main() {
-    let input = "(add 22 (subtract 4 2))";
+    let input = "(concat \"add\" \"this\")";
     println!("{:?}", tokenizer::tokenize(input));
 }
