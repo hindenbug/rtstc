@@ -3,5 +3,7 @@ mod parser;
 
 fn main() {
     let input = "(concat \"add\" \"this\")";
-    println!("{:?}", tokenizer::tokenize(input));
+    let tokens = tokenizer::tokenize(input);
+
+    println!("{:?}", parser::parse(input));
 }

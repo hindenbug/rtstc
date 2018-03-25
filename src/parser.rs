@@ -20,18 +20,26 @@ pub struct Expression {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Program {
+pub struct Ast {
     type_: NodeType,
     body: Vec<Node>,
 }
 
-pub fn parse(tokens: Vec<::tokenizer::Token>) -> Result<Program, String> {
-    let mut program = Program {
+pub fn parse(tokens: Vec<::tokenizer::Token>) -> Result<Ast, String> {
+
+    while let Some(token) = tokens.next() {
+        match token {
+
+            _ => Err("Parsing Error")
+        }
+    }
+    /*
+    let mut program = Ast {
         type_: NodeType::Program,
         body: vec![],
-    };
+    };*/
 
-    Ok(Program)
+    Ok(_)
 }
 
 #[cfg(test)]
@@ -81,7 +89,7 @@ mod tests {
 
         assert_eq!(
             parse(tokens),
-            Ok(Program {
+            Ok(Ast {
                 type_: NodeType::Program,
                 body: vec![
                     Expression {
