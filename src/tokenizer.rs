@@ -9,8 +9,8 @@ pub enum TokenType {
 
 #[derive(Debug, PartialEq)]
 pub struct Token {
-    type_: TokenType,
-    value: String,
+    pub type_: TokenType,
+    pub value: String,
 }
 
 pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {

@@ -5,5 +5,5 @@ fn main() {
     let input = "(concat \"add\" \"this\")";
     let tokens = tokenizer::tokenize(input);
 
-    println!("{:?}", parser::parse(input));
+    println!("{:?}", parser::parse(tokens.unwrap()));
 }

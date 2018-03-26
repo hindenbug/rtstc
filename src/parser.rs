@@ -25,12 +25,21 @@ pub struct Ast {
     body: Vec<Node>,
 }
 
+fn walk(token: &::tokenizer::Token) -> Result<Node, String> {
+    match token.type_ {
+        ::tokenizer::TokenType::Number => Ok(Node { type_: NodeType::NumericalLiteral, value: token.value }),
+        ::tokenizer::TokenType::String => Ok(Node { type_: NodeType::StringLiteral, value: token.value}),
+        _ => return Err("Error".to_string()),
+    }
+}
+
 pub fn parse(tokens: Vec<::tokenizer::Token>) -> Result<Ast, String> {
+    let mut nodes = vec![];
 
-    while let Some(token) = tokens.next() {
-        match token {
-
-            _ => Err("Parsing Error")
+    while let Some(token) = tokens.into_iter().next() {
+        match walk(&token) {
+            Ok(node) => nodes.push(node),
+            _ => return Err("Parsing Error".to_string())
         }
     }
     /*
@@ -39,7 +48,7 @@ pub fn parse(tokens: Vec<::tokenizer::Token>) -> Result<Ast, String> {
         body: vec![],
     };*/
 
-    Ok(_)
+    Ok(Ast {type_: NodeType::Program, body: nodes})
 }
 
 #[cfg(test)]
@@ -94,23 +103,23 @@ mod tests {
                 body: vec![
                     Expression {
                         type_: NodeType::CallExpression,
-                        name: "add",
+                        name: "add".to_string(),
                         params: vec![
                             Node {
-                                type_: NodeType::NumberLiteral,
-                                value: "2",
+                                type_: NodeType::NumericalLiteral,
+                                value: "2".to_string(),
                             },
                             Expression {
                                 type_: NodeType::CallExpression,
-                                name: "subtract",
+                                name: "subtract".to_string(),
                                 params: vec![
                                     Node {
-                                        type_: NodeType::NumberLiteral,
-                                        value: "4",
+                                        type_: NodeType::NumericalLiteral,
+                                        value: "4".to_string(),
                                     },
                                     Node {
-                                        type_: NodeType::NumberLiteral,
-                                        value: "2",
+                                        type_: NodeType::NumericalLiteral,
+                                        value: "2".to_string(),
                                     },
                                 ],
                             },
