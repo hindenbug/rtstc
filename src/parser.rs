@@ -1,54 +1,70 @@
-#[derive(Debug, PartialEq)]
-pub enum NodeType {
-    Program,
-    CallExpression,
-    StringLiteral,
-    NumericalLiteral,
-}
+use std::slice::Iter;
 
 #[derive(Debug, PartialEq)]
-pub struct Node {
-    type_: NodeType,
-    value: String,
+pub enum Node {
+    Program { body: Vec<Node> },
+    CallExpression { name: String, params: Vec<Node> },
+    StringLiteral { value: String },
+    NumberLiteral { value: String },
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Expression {
-    type_: NodeType,
-    name: String,
-    params: Vec<Node>,
-}
-
-#[derive(Debug, PartialEq)]
-pub struct Ast {
-    type_: NodeType,
-    body: Vec<Node>,
-}
-
-fn walk(token: &::tokenizer::Token) -> Result<Node, String> {
+fn walk(
+    token: &::tokenizer::Token,
+    tokens_iter: &mut Iter<::tokenizer::Token>,
+) -> Result<Node, String> {
     match token.type_ {
-        ::tokenizer::TokenType::Number => Ok(Node { type_: NodeType::NumericalLiteral, value: token.value }),
-        ::tokenizer::TokenType::String => Ok(Node { type_: NodeType::StringLiteral, value: token.value}),
+        ::tokenizer::TokenType::Number => Ok(Node::NumberLiteral {
+            value: token.value.to_string(),
+        }),
+        ::tokenizer::TokenType::String => Ok(Node::StringLiteral {
+            value: token.value.to_string(),
+        }),
+        ::tokenizer::TokenType::OpenParen => {
+            if let Some(tkn) = tokens_iter.next() {
+                match tkn.type_ {
+                    ::tokenizer::TokenType::Operation => {
+                        let mut params: Vec<Node> = vec![];
+
+                        while let Some(c) = tokens_iter.clone().peekable().peek() {
+                            match c.type_ {
+                                ::tokenizer::TokenType::CloseParen => {
+                                    tokens_iter.next().unwrap();
+                                    break;
+                                }
+                                _ => match walk(&tokens_iter.next().unwrap(), tokens_iter) {
+                                    Ok(node) => params.push(node),
+                                    Err(value) => return Err(value),
+                                },
+                            }
+                        }
+
+                        Ok(Node::CallExpression {
+                            name: tkn.value.to_string(),
+                            params: params,
+                        })
+                    }
+                    _ => return Err("Error".to_string()),
+                }
+            } else {
+                return Err("Error".to_string());
+            }
+        }
         _ => return Err("Error".to_string()),
     }
 }
 
-pub fn parse(tokens: Vec<::tokenizer::Token>) -> Result<Ast, String> {
+pub fn parse(tokens: &Vec<::tokenizer::Token>) -> Result<Node, String> {
     let mut nodes = vec![];
+    let mut tokens_iter = tokens.into_iter();
 
-    while let Some(token) = tokens.into_iter().next() {
-        match walk(&token) {
+    while let Some(token) = tokens_iter.next() {
+        match walk(&token, &mut tokens_iter) {
             Ok(node) => nodes.push(node),
-            _ => return Err("Parsing Error".to_string())
+            _ => return Err("Parsing Error".to_string()),
         }
     }
-    /*
-    let mut program = Ast {
-        type_: NodeType::Program,
-        body: vec![],
-    };*/
 
-    Ok(Ast {type_: NodeType::Program, body: nodes})
+    Ok(Node::Program { body: nodes })
 }
 
 #[cfg(test)]
@@ -68,7 +84,7 @@ mod tests {
             },
             ::tokenizer::Token {
                 type_: ::tokenizer::TokenType::Number,
-                value: "22".to_string(),
+                value: "2".to_string(),
             },
             ::tokenizer::Token {
                 type_: ::tokenizer::TokenType::OpenParen,
@@ -97,28 +113,22 @@ mod tests {
         ];
 
         assert_eq!(
-            parse(tokens),
-            Ok(Ast {
-                type_: NodeType::Program,
+            parse(&tokens),
+            Ok(Node::Program {
                 body: vec![
-                    Expression {
-                        type_: NodeType::CallExpression,
+                    Node::CallExpression {
                         name: "add".to_string(),
                         params: vec![
-                            Node {
-                                type_: NodeType::NumericalLiteral,
+                            Node::NumberLiteral {
                                 value: "2".to_string(),
                             },
-                            Expression {
-                                type_: NodeType::CallExpression,
+                            Node::CallExpression {
                                 name: "subtract".to_string(),
                                 params: vec![
-                                    Node {
-                                        type_: NodeType::NumericalLiteral,
+                                    Node::NumberLiteral {
                                         value: "4".to_string(),
                                     },
-                                    Node {
-                                        type_: NodeType::NumericalLiteral,
+                                    Node::NumberLiteral {
                                         value: "2".to_string(),
                                     },
                                 ],

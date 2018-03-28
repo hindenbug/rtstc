@@ -60,7 +60,10 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
 
                 while let Some(c) = chars_.clone().peekable().peek() {
                     match c {
-                        &'"' => break,
+                        &'"' => {
+                            chars_.next().unwrap();
+                            break;
+                        }
                         _ => str_.push(chars_.next().unwrap()),
                     }
                 }
@@ -69,8 +72,6 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
                     type_: TokenType::String,
                     value: str_,
                 });
-
-                chars_.next().unwrap();
             }
             _ => return Err(format!("Error : {}", ch)),
         }
