@@ -1,5 +1,6 @@
 mod parser;
 mod tokenizer;
+mod traverser;
 
 fn main() {
     //let input = "(concat \"add\" \"this\")";
