@@ -1,4 +1,6 @@
-pub fn traverse(ast: ::parser::Node) {
+pub fn transform(ast: ::parser::Node) {
+
+    let mut new_ast = ::parser::Node::Program { body: []};
 
 }
 
@@ -7,7 +9,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_traverser_1() {
+    fn test_transform_1() {
         let ast = ::parser::Node::Program {
             body: vec![
                 ::parser::Node::CallExpression {
@@ -32,6 +34,6 @@ mod tests {
             ],
         };
 
-        assert_eq!(traverse(ast), {})
+        assert_eq!(transform(ast), {})
     }
 }
