@@ -1,3 +1,10 @@
+struct Visitor {
+
+}
+
+impl Visitor {
+}
+
 pub fn traverse(ast: ::parser::Node) {
 
 }
